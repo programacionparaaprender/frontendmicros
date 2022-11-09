@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Tio } from '../models/tio';
 import axios from "axios";
@@ -10,6 +10,9 @@ import axios from "axios";
 })
 
 export class TioService {
+  urlToken:string = 'http://localhost:8090/api/security/oauth/token';
+  listaUrl:string = 'http://localhost:8090/api/usuarios/usuarios/';
+  
   tioURL = 'http://localhost:8762/api/tio/';
   //tioURL = 'https://servicios-profesionales.herokuapp.com/tio/';
   usuariologeado = false;
@@ -19,17 +22,24 @@ export class TioService {
   obtenerUsuarioLogeado(): boolean{
     return this.usuariologeado;
   }
+  
   cambiarLogeo(valor:boolean): void {
     this.usuariologeado = valor;
   }
 
   lista(): Observable<Tio[]> {
+    return this.httpClient.get<Tio[]>(this.listaUrl);
+  }
+
+  listaAnterior(): Observable<Tio[]> {
     return this.httpClient.get<Tio[]>(this.tioURL + 'lista');
   }
 
   detalle(id: number): Observable<Tio> {
     return this.httpClient.get<Tio>(this.tioURL + `detalle/${id}`);
   }
+
+  
 
   async login(tio: Tio){
     try{

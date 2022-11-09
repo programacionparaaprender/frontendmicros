@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Tio } from '../models/tio';
 import axios from "axios";
@@ -10,7 +10,7 @@ import { tokenName } from '@angular/compiler';
   providedIn: 'root'
 })
 export class TokenService {
-
+  urlToken:string = 'http://localhost:8090/api/security/oauth/token';
   tokenURL = 'http://localhost:8762/token/';
   tioURL = 'http://localhost:8762/api/tio/';
   apiv1URL = 'http://localhost:9756/api/v1';
@@ -87,8 +87,46 @@ export class TokenService {
     return response;
   }
 
+  async login(tio: Tio){
+    try{
+      var response;
+      var token:string = "";
+      const headers = new HttpHeaders(
+        {
+          'Authorization':'Basic ZnJvbnRlbmRhcHA6MTIzNDU=',
+          'Content-Type':'application/x-www-form-urlencoded'
+        }
+      );
+      const body = new HttpParams()
+      .set('username', tio.nombre)
+      .set('password', tio.password)
+      .set('grant_type','password');
+    
+      response = await  this.httpClient.post(this.urlToken , body, {headers: headers}).toPromise();
+      if(response){
+        /*
+        {
+    "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX25hbWUiOiJhbmRyZXMiLCJzY29wZSI6WyJyZWFkIiwid3JpdGUiXSwiYXBlbGxpZG8iOiJHdXptYW4iLCJjb3JyZW8iOiJwcm9mZXNvckBib2xzYWRlaWRlYXMuY29tIiwiZXhwIjoxNjY3OTYzOTMyLCJub21icmUiOiJBbmRyZXMiLCJhdXRob3JpdGllcyI6WyJST0xFX1VTRVIiXSwianRpIjoiYjIwNGYxZjItNjQ5Yy00OGFjLWIwODQtMzhlNDgxMzAwZWE4IiwiY2xpZW50X2lkIjoiZnJvbnRlbmRhcHAifQ.VrplfQY_iGr5D7oBcyJTQCj7ccdWZHlxMJpy0UHfqkg",
+    "token_type": "bearer",
+    "refresh_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX25hbWUiOiJhbmRyZXMiLCJzY29wZSI6WyJyZWFkIiwid3JpdGUiXSwiYXBlbGxpZG8iOiJHdXptYW4iLCJjb3JyZW8iOiJwcm9mZXNvckBib2xzYWRlaWRlYXMuY29tIiwiYXRpIjoiYjIwNGYxZjItNjQ5Yy00OGFjLWIwODQtMzhlNDgxMzAwZWE4IiwiZXhwIjoxNjY3OTYzOTMyLCJub21icmUiOiJBbmRyZXMiLCJhdXRob3JpdGllcyI6WyJST0xFX1VTRVIiXSwianRpIjoiZWU0ZDIwNWMtMzQ3YS00NmZlLTlkMjYtNjdiMjE2NGI4ZTZiIiwiY2xpZW50X2lkIjoiZnJvbnRlbmRhcHAifQ.LHaYCkJybaO6WvXIZ4xLFKJfuauuWUhFbhl8LX5qgo0",
+    "expires_in": 3599,
+    "scope": "read write",
+    "apellido": "Guzman",
+    "correo": "profesor@bolsadeideas.com",
+    "nombre": "Andres",
+    "jti": "b204f1f2-649c-48ac-b084-38e481300ea8"
+}
+        */
+        token = response.access_token;
+        window.localStorage.removeItem('token');
+        window.localStorage.setItem('token', token);   
+      }
+    }catch(e){
+        console.log(e);
+    }
+  }
 
-  async login(tio: Tio) {
+  async loginAnterior(tio: Tio) {
     var token:string = "";
     const user = {
       "username": tio.nombre,
@@ -110,6 +148,7 @@ export class TokenService {
   async logout() {
     try{
         window.localStorage.removeItem('token');
+        window.localStorage.removeItem('login');
     }catch(e){
         console.log(e);
     }

@@ -27,6 +27,8 @@ export class LoginUsuariosComponent implements OnInit {
     private router: Router,
     private tokenService: TokenService,
     private store: Store<AppState>) { 
+    //window.localStorage.removeItem('login');
+    
     this.login = this.store.select('login');
     if(localStorage.getItem('login')){
       const usuario = JSON.parse(localStorage.getItem('login'))
